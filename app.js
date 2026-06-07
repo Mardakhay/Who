@@ -1,0 +1,15 @@
+const views=[...document.querySelectorAll('.view')],mods=[...document.querySelectorAll('.modal')],q=document.getElementById('questionText'),p=document.getElementById('progressText'),f=document.getElementById('progressFill'),g=document.getElementById('guessName'),c=document.getElementById('confidenceValue'),cf=document.getElementById('confidenceFill');
+const qs=['Is your character real?','Is your character from a movie?','Is your character fictional?','Is your character known for fighting?','Is your character a woman?','Is your character a superhero?'];
+const gs=['Batman','Taylor Swift','Sherlock Holmes','Naruto'];
+const s={i:0,t:'landing',h:JSON.parse(localStorage.getItem('whoHistory')||'[]')};
+const show=t=>{s.t=t;views.forEach(v=>v.classList.toggle('is-active',v.dataset.view===t));};
+const open=id=>document.getElementById(id)?.showModal();
+const closeAll=()=>mods.forEach(m=>m.open&&m.close());
+const saveHist=e=>{s.h.unshift({name:e.name,conf:e.conf,ok:e.ok,at:new Date().toLocaleDateString()});s.h=s.h.slice(0,5);localStorage.setItem('whoHistory',JSON.stringify(s.h));};
+const renderHist=()=>{const box=document.querySelector('#historyModal .modal-card');box.querySelectorAll('.history-item').forEach(n=>n.remove());s.h.forEach(r=>{const d=document.createElement('div');d.className='history-item';d.innerHTML=`<span>${r.name}</span><small>${r.conf}% · ${r.ok?'correct':'learned'}</small>`;box.appendChild(d);});};
+const start=()=>{s.i=0;q.textContent=qs[0];p.textContent='1 / '+qs.length;f.style.width='12%';show('game');};
+const next=a=>{s.i++;const end=s.i>=qs.length;f.style.width=Math.min(100,Math.round((s.i/qs.length)*100))+'%';p.textContent=Math.min(s.i+1,qs.length)+' / '+qs.length;if(end)return result(a);q.textContent=qs[s.i];};
+const result=a=>{const n=gs[Math.floor(Math.random()*gs.length)];const conf=a==='yes'?94:a==='no'?84:76;g.textContent=n;c.textContent=conf+'%';cf.style.width=conf+'%';saveHist({name:n,conf,ok:true});renderHist();show('result');};
+document.addEventListener('click',e=>{const a=e.target.closest('[data-action]')?.dataset.action;const o=e.target.closest('[data-open]')?.dataset.open;const ans=e.target.closest('[data-answer]')?.dataset.answer;if(a==='startGame'||a==='restart')start();if(o)open(o);if(ans)next(ans);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();if(s.t!=='game')return;const map={y:'yes',n:'no',p:'probably',h:'probably_not','?':'dont_know'};if(map[e.key.toLowerCase()])next(map[e.key.toLowerCase()]);});
+renderHist();show('landing');
