@@ -34,6 +34,10 @@ body {
   letter-spacing: 0;
 }
 
+#root {
+  min-height: 100vh;
+}
+
 body[data-theme="soft"] {
   --bg: #f8f8f5;
   --accent-soft: #ece8df;
@@ -228,6 +232,10 @@ h3 {
   color: var(--danger);
 }
 
+.form-submit {
+  margin-top: 18px;
+}
+
 .text-btn {
   align-self: flex-start;
   margin-top: 18px;
@@ -317,13 +325,22 @@ h3 {
 }
 
 .modal {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
   width: min(92vw, 560px);
-  border: 0;
+  height: fit-content;
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  margin: auto;
   padding: 0;
   background: transparent;
 }
 
-.modal::backdrop {
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
   background: rgba(245, 245, 241, 0.68);
   backdrop-filter: blur(8px);
 }
@@ -332,6 +349,10 @@ h3 {
   width: 100%;
   padding: clamp(24px, 5vw, 34px);
   position: relative;
+}
+
+.modal form {
+  margin: 0;
 }
 
 .close-btn {
