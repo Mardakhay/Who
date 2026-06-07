@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Who?</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <div class="bg-blobs" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+
+      <header class="topbar">
+        <div class="brand">Who<span>?</span></div>
+        <button class="ghost-btn" data-open="settingsModal">Settings</button>
+      </header>
+
+      <section class="view is-active" data-view="landing">
+        <article class="glass-card hero-card">
+          <p class="eyebrow">Minimal guessing game</p>
+          <h1>Think of someone.</h1>
+          <p class="subcopy">I’ll ask a few questions and try to guess who it is.</p>
+          <div class="cta-row">
+            <button class="primary-btn" data-action="startGame">Start</button>
+            <button class="secondary-btn" data-open="howItWorksModal">How it works</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" data-view="game">
+        <article class="glass-card game-card">
+          <div class="progress-row">
+            <span id="progressText">1 / 10</span>
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+          </div>
+          <p class="eyebrow">Question</p>
+          <h2 id="questionText">Is your character real?</h2>
+          <div class="answer-grid">
+            <button class="answer-btn" data-answer="yes">Yes</button>
+            <button class="answer-btn" data-answer="no">No</button>
+            <button class="answer-btn" data-answer="probably">Probably</button>
+            <button class="answer-btn" data-answer="probably_not">Probably not</button>
+            <button class="answer-btn wide" data-answer="dont_know">Don’t know</button>
+          </div>
+          <div class="card-actions">
+            <button class="ghost-btn" data-open="historyModal">History</button>
+            <button class="ghost-btn" data-open="keyboardModal">Shortcuts</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="view" data-view="result">
+        <article class="glass-card result-card">
+          <p class="eyebrow">Result</p>
+          <h2>I think it’s <span id="guessName">Batman</span>.</h2>
+          <p class="subcopy">Confidence: <strong id="confidenceValue">94%</strong></p>
+          <div class="progress-track confidence"><div class="progress-fill" id="confidenceFill"></div></div>
+          <div class="cta-row">
+            <button class="primary-btn" data-action="restart">Play again</button>
+            <button class="secondary-btn" data-open="wrongModal">Not correct</button>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <dialog class="modal" id="howItWorksModal">
+      <form method="dialog" class="modal-card glass-card">
+        <button class="close-btn" value="cancel">×</button>
+        <p class="eyebrow">How it works</p>
+        <h3>Think. Answer. Guess.</h3>
+        <ol>
+          <li>Think of a person, character, or celebrity.</li>
+          <li>Answer simple questions.</li>
+          <li>Let the app make its best guess.</li>
+        </ol>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="settingsModal">
+      <form method="dialog" class="modal-card glass-card">
+        <button class="close-btn" value="cancel">×</button>
+        <p class="eyebrow">Settings</p>
+        <h3>Personalize the experience</h3>
+        <div class="setting-row"><span>Theme</span><button class="chip">Light</button></div>
+        <div class="setting-row"><span>Sounds</span><button class="chip">Off</button></div>
+        <div class="setting-row"><span>Animations</span><button class="chip">Soft</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="wrongModal">
+      <form method="dialog" class="modal-card glass-card">
+        <button class="close-btn" value="cancel">×</button>
+        <p class="eyebrow">Not correct</p>
+        <h3>Teach Who? the right answer</h3>
+        <label>Correct name<input type="text" placeholder="e.g. Spider-Man" /></label>
+        <label>Distinguishing question<textarea rows="3" placeholder="What question separates them?"></textarea></label>
+        <button class="primary-btn" value="save">Save & Learn</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="historyModal">
+      <form method="dialog" class="modal-card glass-card">
+        <button class="close-btn" value="cancel">×</button>
+        <p class="eyebrow">History</p>
+        <h3>Recent rounds</h3>
+        <div class="history-item"><span>Batman</span><small>94% · correct</small></div>
+        <div class="history-item"><span>Taylor Swift</span><small>88% · correct</small></div>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="keyboardModal">
+      <form method="dialog" class="modal-card glass-card">
+        <button class="close-btn" value="cancel">×</button>
+        <p class="eyebrow">Shortcuts</p>
+        <h3>Keyboard controls</h3>
+        <div class="shortcut-row"><span>Y</span><span>Yes</span></div>
+        <div class="shortcut-row"><span>N</span><span>No</span></div>
+        <div class="shortcut-row"><span>P</span><span>Probably</span></div>
+        <div class="shortcut-row"><span>Esc</span><span>Close</span></div>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
