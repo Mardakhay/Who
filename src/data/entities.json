@@ -1,0 +1,502 @@
+[
+  {
+    "id": "batman",
+    "name": "Batman",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": true,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": true,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "spider_man",
+    "name": "Spider-Man",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": true,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": true,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "superman",
+    "name": "Superman",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": true,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": true,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "naruto",
+    "name": "Naruto",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": true,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "goku",
+    "name": "Goku",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": true,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "taylor_swift",
+    "name": "Taylor Swift",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": true,
+      "is_athlete": false,
+      "is_male": false,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "beyonce",
+    "name": "Beyoncé",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": true,
+      "is_athlete": false,
+      "is_male": false,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "cristiano_ronaldo",
+    "name": "Cristiano Ronaldo",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": true,
+      "is_male": true,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "lionel_messi",
+    "name": "Lionel Messi",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": true,
+      "is_male": true,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "elon_musk",
+    "name": "Elon Musk",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "albert_einstein",
+    "name": "Albert Einstein",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "sherlock_holmes",
+    "name": "Sherlock Holmes",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "harry_potter",
+    "name": "Harry Potter",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "hermione_granger",
+    "name": "Hermione Granger",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": false,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "iron_man",
+    "name": "Iron Man",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": true,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": true,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "wonder_woman",
+    "name": "Wonder Woman",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": true,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": false,
+      "is_alive": false,
+      "is_dc_comics": true,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "joker",
+    "name": "The Joker",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": true,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": true,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "darth_vader",
+    "name": "Darth Vader",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": true,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "luke_skywalker",
+    "name": "Luke Skywalker",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "lebron_james",
+    "name": "LeBron James",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": true,
+      "is_male": true,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "serena_williams",
+    "name": "Serena Williams",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": true,
+      "is_male": false,
+      "is_alive": true,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "marie_curie",
+    "name": "Marie Curie",
+    "facts": {
+      "is_fictional": false,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": true,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": false,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": true,
+      "is_from_tv_or_film": false
+    }
+  },
+  {
+    "id": "thanos",
+    "name": "Thanos",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": true,
+      "has_superpowers": true,
+      "is_villain": true,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "black_widow",
+    "name": "Black Widow",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": true,
+      "is_from_anime": false,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": false,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": true,
+      "has_superpowers": false,
+      "is_villain": false,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  },
+  {
+    "id": "light_yagami",
+    "name": "Light Yagami",
+    "facts": {
+      "is_fictional": true,
+      "is_superhero": false,
+      "is_from_anime": true,
+      "is_real": false,
+      "is_musician": false,
+      "is_athlete": false,
+      "is_male": true,
+      "is_alive": false,
+      "is_dc_comics": false,
+      "is_marvel_comics": false,
+      "has_superpowers": true,
+      "is_villain": true,
+      "is_scientist_inventor": false,
+      "is_from_tv_or_film": true
+    }
+  }
+]
