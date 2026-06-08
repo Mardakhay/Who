@@ -63,11 +63,7 @@ export function App() {
   }, [stored]);
 
   useEffect(() => {
-    if (view === "landing") {
-      document.body.dataset.theme = "light";
-      return;
-    }
-    document.body.dataset.theme = "light";
+    document.body.dataset.theme = view === "landing" ? "light" : "soft";
   }, [view]);
 
   useEffect(() => {
@@ -209,10 +205,10 @@ export function App() {
             Who<span>?</span>
           </button>
           <nav className="top-actions" aria-label="App actions">
-            <button className="ghost-btn" type="button" onClick={() => setActiveModal("history")}>
+            <button className="ghost-btn" type="button" onClick={() => setActiveModal("history") }>
               History
             </button>
-            <button className="ghost-btn" type="button" onClick={() => setActiveModal("keyboard")}>
+            <button className="ghost-btn" type="button" onClick={() => setActiveModal("keyboard") }>
               Shortcuts
             </button>
           </nav>
@@ -361,68 +357,87 @@ export function App() {
               No
             </label>
           </fieldset>
-          <button className="primary-btn form-submit" type="submit">
-            Save and learn
-          </button>
+          <div className="modal-actions">
+            <button className="primary-btn" type="submit">
+              Save knowledge
+            </button>
+            <button className="secondary-btn" type="button" onClick={() => setActiveModal(null)}>
+              Cancel
+            </button>
+          </div>
         </form>
       </Modal>
 
       <Modal isOpen={activeModal === "history"} onClose={() => setActiveModal(null)} labelledBy="historyTitle">
         <p className="eyebrow">History</p>
-        <h3 id="historyTitle">Recent rounds</h3>
-        <div className="history-list">
-          {stored.history.length === 0 ? (
-            <p className="modal-note">No rounds yet.</p>
-          ) : (
-            stored.history.map((round, index) => (
-              <div className="history-item" key={`${round.character}-${round.date}-${index}`}>
-                <span>{round.character}</span>
-                <small>
-                  {round.confidence}% — {round.success ? "correct" : "learned"} — {round.date}
-                </small>
-              </div>
-            ))
-          )}
+        <div className="history-header">
+          <h3 id="historyTitle">Recent rounds</h3>
+          <button className="danger-btn" type="button" onClick={resetData}>
+            Reset data
+          </button>
         </div>
-        <button className="danger-btn" type="button" onClick={resetData}>
-          Reset learned data
-        </button>
+        {stored.history.length === 0 ? (
+          <p className="modal-note">No saved rounds yet.</p>
+        ) : (
+          <div className="history-list">
+            {stored.history.map((item, index) => (
+              <article className="history-item" key={`${item.character}-${index}`}>
+                <div>
+                  <strong>{item.character}</strong>
+                  <p>{item.date}</p>
+                </div>
+                <span className={item.success ? "badge success" : "badge fail"}>
+                  {item.success ? `${item.confidence}%` : "Learned"}
+                </span>
+              </article>
+            ))}
+          </div>
+        )}
       </Modal>
 
       <Modal isOpen={activeModal === "keyboard"} onClose={() => setActiveModal(null)} labelledBy="keyboardTitle">
         <p className="eyebrow">Shortcuts</p>
-        <h3 id="keyboardTitle">Keyboard controls</h3>
-        <div className="shortcut-row"><kbd>Y</kbd><span>Yes</span></div>
-        <div className="shortcut-row"><kbd>N</kbd><span>No</span></div>
-        <div className="shortcut-row"><kbd>P</kbd><span>Probably</span></div>
-        <div className="shortcut-row"><kbd>H</kbd><span>Probably not</span></div>
-        <div className="shortcut-row"><kbd>?</kbd><span>Don't know</span></div>
-        <div className="shortcut-row"><kbd>Esc</kbd><span>Close modal</span></div>
+        <h3 id="keyboardTitle">Quick answers</h3>
+        <ul className="shortcut-list">
+          <li><kbd>Y</kbd> Yes</li>
+          <li><kbd>N</kbd> No</li>
+          <li><kbd>P</kbd> Probably</li>
+          <li><kbd>H</kbd> Probably not</li>
+          <li><kbd>?</kbd> Don't know</li>
+          <li><kbd>Esc</kbd> Close modal</li>
+        </ul>
       </Modal>
-
-      {activeModal && <div className="modal-backdrop" onClick={() => setActiveModal(null)} />}
     </>
   );
 }
 
 type ModalProps = {
   isOpen: boolean;
+  onClose: () => void;
   labelledBy: string;
   children: ReactNode;
-  onClose: () => void;
 };
 
-function Modal({ isOpen, labelledBy, children, onClose }: ModalProps) {
+function Modal({ isOpen, onClose, labelledBy, children }: ModalProps) {
+  const overlayRef = useRef<HTMLDivElement | null>(null);
+
   if (!isOpen) return null;
 
   return (
-    <div className="modal is-open" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
-      <div className="modal-card glass-card">
-        <button className="close-btn" type="button" onClick={onClose} aria-label="Close">
+    <div
+      className="modal-overlay"
+      ref={overlayRef}
+      onClick={(event) => {
+        if (event.target === overlayRef.current) onClose();
+      }}
+      role="presentation"
+    >
+      <article className="modal-card" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
+        <button className="modal-close" type="button" aria-label="Close modal" onClick={onClose}>
           ×
         </button>
         {children}
-      </div>
+      </article>
     </div>
   );
 }
