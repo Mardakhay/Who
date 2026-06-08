@@ -215,9 +215,6 @@ export function App() {
             <button className="ghost-btn" type="button" onClick={() => setActiveModal("keyboard")}>
               Shortcuts
             </button>
-            <button className="ghost-btn" type="button" onClick={() => setActiveModal("how")}>
-              How it works
-            </button>
           </nav>
         </header>
 
