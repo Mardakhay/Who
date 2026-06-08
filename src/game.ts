@@ -7,11 +7,19 @@ export const defaultTree: TreeNode = {
   question: "Is your character real?",
   yes: {
     question: "Is your character primarily known for music?",
-    yes: { guess: "Taylor Swift" },
+    yes: {
+      question: "Is your character a pop singer?",
+      yes: { guess: "Taylor Swift" },
+      no: { guess: "Beyoncé" }
+    },
     no: {
-      question: "Is your character known for technology or business?",
-      yes: { guess: "Elon Musk" },
-      no: { guess: "Cristiano Ronaldo" }
+      question: "Is your character primarily known for sports?",
+      yes: { guess: "Cristiano Ronaldo" },
+      no: {
+        question: "Is your character known for technology or business?",
+        yes: { guess: "Elon Musk" },
+        no: { guess: "Albert Einstein" }
+      }
     }
   },
   no: {
@@ -22,9 +30,9 @@ export const defaultTree: TreeNode = {
       no: { guess: "Spider-Man" }
     },
     no: {
-      question: "Is your character a detective?",
-      yes: { guess: "Sherlock Holmes" },
-      no: { guess: "Naruto" }
+      question: "Is your character from anime or manga?",
+      yes: { guess: "Naruto" },
+      no: { guess: "Sherlock Holmes" }
     }
   }
 };
