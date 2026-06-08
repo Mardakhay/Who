@@ -63,6 +63,22 @@ export const getAvailableQuestions = (state: CandidateState, allQuestions: Quest
   });
 };
 
-/** Returns the single best next question, or null if none remain. */
-export const getBestQuestion = (state: CandidateState, allQuestions: Question[]): Question | null =>
-  getAvailableQuestions(state, allQuestions)[0] ?? null;
+/** Returns the single best next question, or null if none remain or no candidates exist. */
+export const getBestQuestion = (state: CandidateState, allQuestions: Question[]): Question | null => {
+  if (state.candidates.length === 0) return null;
+  return getAvailableQuestions(state, allQuestions)[0] ?? null;
+};
+
+/**
+ * When multiple candidates remain and questions are exhausted, picks the one
+ * whose known facts agree with the most recorded answers.
+ */
+export const getBestCandidate = (state: CandidateState): Entity | null => {
+  if (state.candidates.length === 0) return null;
+  const entries = Object.entries(state.answers);
+  return state.candidates.reduce((best, entity) => {
+    const score = entries.filter(([key, val]) => entity.facts[key] === val).length;
+    const bestScore = entries.filter(([key, val]) => best.facts[key] === val).length;
+    return score > bestScore ? entity : best;
+  });
+};

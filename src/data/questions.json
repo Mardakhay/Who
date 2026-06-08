@@ -1,72 +1,23 @@
 [
-  {
-    "id": "q_fictional",
-    "text": "Is your character fictional?",
-    "factKey": "is_fictional"
-  },
-  {
-    "id": "q_real",
-    "text": "Is your character a real person?",
-    "factKey": "is_real"
-  },
-  {
-    "id": "q_superhero",
-    "text": "Is your character a superhero?",
-    "factKey": "is_superhero"
-  },
-  {
-    "id": "q_anime",
-    "text": "Is your character from anime or manga?",
-    "factKey": "is_from_anime"
-  },
-  {
-    "id": "q_musician",
-    "text": "Is your character primarily known for music?",
-    "factKey": "is_musician"
-  },
-  {
-    "id": "q_athlete",
-    "text": "Is your character an athlete?",
-    "factKey": "is_athlete"
-  },
-  {
-    "id": "q_male",
-    "text": "Is your character male?",
-    "factKey": "is_male"
-  },
-  {
-    "id": "q_alive",
-    "text": "Is your character currently alive?",
-    "factKey": "is_alive"
-  },
-  {
-    "id": "q_dc",
-    "text": "Is your character from DC Comics?",
-    "factKey": "is_dc_comics"
-  },
-  {
-    "id": "q_marvel",
-    "text": "Is your character from Marvel Comics?",
-    "factKey": "is_marvel_comics"
-  },
-  {
-    "id": "q_superpowers",
-    "text": "Does your character have supernatural or superhuman powers?",
-    "factKey": "has_superpowers"
-  },
-  {
-    "id": "q_villain",
-    "text": "Is your character a villain?",
-    "factKey": "is_villain"
-  },
-  {
-    "id": "q_scientist",
-    "text": "Is your character known for science or invention?",
-    "factKey": "is_scientist_inventor"
-  },
-  {
-    "id": "q_tv_film",
-    "text": "Is your character primarily known from TV or film?",
-    "factKey": "is_from_tv_or_film"
-  }
+  { "id": "q_fictional",    "text": "Is your character fictional?",                                "factKey": "is_fictional" },
+  { "id": "q_real",         "text": "Is your character a real person?",                            "factKey": "is_real" },
+  { "id": "q_superhero",    "text": "Is your character a superhero?",                              "factKey": "is_superhero" },
+  { "id": "q_anime",        "text": "Is your character from anime or manga?",                      "factKey": "is_from_anime" },
+  { "id": "q_musician",     "text": "Is your character primarily known for music?",                "factKey": "is_musician" },
+  { "id": "q_athlete",      "text": "Is your character an athlete?",                              "factKey": "is_athlete" },
+  { "id": "q_male",         "text": "Is your character male?",                                    "factKey": "is_male" },
+  { "id": "q_female",       "text": "Is your character female?",                                  "factKey": "is_female" },
+  { "id": "q_alive",        "text": "Is your character currently alive?",                         "factKey": "is_alive" },
+  { "id": "q_dc",           "text": "Is your character from DC Comics?",                          "factKey": "is_dc_comics" },
+  { "id": "q_marvel",       "text": "Is your character from Marvel Comics?",                      "factKey": "is_marvel_comics" },
+  { "id": "q_superpowers",  "text": "Does your character have supernatural or superhuman powers?", "factKey": "has_superpowers" },
+  { "id": "q_villain",      "text": "Is your character a villain?",                               "factKey": "is_villain" },
+  { "id": "q_scientist",    "text": "Is your character known for science or invention?",          "factKey": "is_scientist_inventor" },
+  { "id": "q_tv_film",      "text": "Is your character primarily known from TV or film?",         "factKey": "is_from_tv_or_film" },
+  { "id": "q_book",         "text": "Did your character originate in a book?",                    "factKey": "is_from_book" },
+  { "id": "q_actor",        "text": "Is your character an actor or performer?",                   "factKey": "is_actor_performer" },
+  { "id": "q_politician",   "text": "Is your character a politician or head of state?",           "factKey": "is_politician" },
+  { "id": "q_video_game",   "text": "Is your character from a video game?",                       "factKey": "is_from_video_game" },
+  { "id": "q_royalty",      "text": "Is your character royalty or a monarch?",                    "factKey": "is_royalty" },
+  { "id": "q_animated",     "text": "Is your character animated or from a cartoon/comic?",       "factKey": "is_animated" }
 ]

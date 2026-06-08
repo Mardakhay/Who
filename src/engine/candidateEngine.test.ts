@@ -5,6 +5,7 @@ import {
   createCandidateState,
   filterCandidates,
   getAvailableQuestions,
+  getBestQuestion,
   getRemainingCandidates
 } from "./candidateEngine";
 
@@ -66,7 +67,6 @@ describe("filterCandidates", () => {
   });
 
   it("returns empty array when no candidates match", () => {
-    const result = filterCandidates(ALL_ENTITIES, { is_fictional: true, is_fictional_also: false });
     const contradicted = filterCandidates(ALL_ENTITIES, { is_fictional: true, is_from_anime: true, is_superhero: true });
     expect(contradicted).toHaveLength(0);
   });
@@ -124,5 +124,53 @@ describe("getAvailableQuestions", () => {
       state = applyAnswer(state, q.id, q.factKey, true);
     }
     expect(getAvailableQuestions(state, QUESTIONS)).toHaveLength(0);
+  });
+
+  it("sorts questions by information gain — closest to 50/50 split first", () => {
+    // Batman & Naruto are fictional (2/3), Taylor Swift is not.
+    // q_fictional splits 2 true / 1 false  → |2/3 - 0.5| = 0.167
+    // q_anime splits 1 true / 2 false       → |1/3 - 0.5| = 0.167 (tied)
+    // q_superhero splits 1 true / 2 false   → |1/3 - 0.5| = 0.167 (tied)
+    // All equal, so at minimum the sort must not throw and must return 3 items.
+    const state = createCandidateState(ALL_ENTITIES);
+    const sorted = getAvailableQuestions(state, QUESTIONS);
+    expect(sorted).toHaveLength(3);
+  });
+
+  it("prefers a question that splits candidates exactly in half when possible", () => {
+    // batman: is_superhero=true, is_fictional=true, is_from_anime=false
+    // taylor_swift: is_superhero=false, is_fictional=false, is_from_anime=false
+    // q_superhero splits 1/1 (50/50, score=0), q_fictional splits 1/1 (50/50, score=0)
+    // q_anime splits 0/2 (worst, score=-0.5)
+    // The two perfectly-splitting questions should rank above q_anime.
+    const twoEntities = [BATMAN, TAYLOR_SWIFT];
+    const state = createCandidateState(twoEntities);
+    const sorted = getAvailableQuestions(state, QUESTIONS);
+    const lastId = sorted[sorted.length - 1].id;
+    expect(lastId).toBe("q_anime");
+  });
+});
+
+describe("getBestQuestion", () => {
+  it("returns a question that maximises information gain (not q_anime, which has no split)", () => {
+    // batman & taylor_swift both have is_from_anime=false, so q_anime gives no information.
+    // getBestQuestion must not return q_anime when better questions exist.
+    const twoEntities = [BATMAN, TAYLOR_SWIFT];
+    const state = createCandidateState(twoEntities);
+    const best = getBestQuestion(state, QUESTIONS);
+    expect(best?.id).not.toBe("q_anime");
+  });
+
+  it("returns null when no questions remain", () => {
+    let state = createCandidateState(ALL_ENTITIES);
+    for (const q of QUESTIONS) {
+      state = applyAnswer(state, q.id, q.factKey, true);
+    }
+    expect(getBestQuestion(state, QUESTIONS)).toBeNull();
+  });
+
+  it("returns null when there are no candidates", () => {
+    const state = createCandidateState([]);
+    expect(getBestQuestion(state, QUESTIONS)).toBeNull();
   });
 });

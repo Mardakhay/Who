@@ -12,7 +12,7 @@ import {
   saveStoredState
 } from "./game";
 import type { Answer, BranchSide, HistoryItem, ModalName, PathItem, StoredState, ViewName } from "./types";
-import { applyAnswer, createCandidateState, getBestQuestion } from "./engine/candidateEngine";
+import { applyAnswer, createCandidateState, getBestCandidate, getBestQuestion } from "./engine/candidateEngine";
 import type { CandidateState, Question } from "./types/engine";
 import entitiesData from "./data/entities.json";
 import questionsData from "./data/questions.json";
@@ -170,7 +170,7 @@ export function App() {
       setCandidateState(nextState);
 
       if (remaining.length <= 1 || nextQ === null) {
-        const topGuess = remaining[0]?.name ?? "someone";
+        const topGuess = (remaining.length <= 1 ? remaining[0] : getBestCandidate(nextState))?.name ?? "someone";
         setGuess(topGuess);
         setCurrentQuestion(null);
         setIsThinking(false);
