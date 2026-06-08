@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   HISTORY_LIMIT,
@@ -12,7 +12,7 @@ import {
   replaceNodeAtPath,
   saveStoredState
 } from "./game";
-import type { Answer, BranchSide, HistoryItem, ModalName, PathItem, Settings, StoredState, ViewName } from "./types";
+import type { Answer, BranchSide, HistoryItem, ModalName, PathItem, StoredState, ViewName } from "./types";
 
 type LearnFormState = {
   correctName: string;
@@ -53,18 +53,22 @@ export function App() {
     correctSide: "yes"
   });
 
-  const branchPath = useMemo(() => path.map((item) => item.branch), [path]);
-  const currentNode = useMemo(() => getNodeAtPath(stored.tree, branchPath), [stored.tree, branchPath]);
-  const resultConfidence = useMemo(
-    () => Math.max(50, Math.min(96, confidence - Math.max(0, path.length - 2) * 2)),
-    [confidence, path.length]
-  );
+  const timerRef = useRef<number | null>(null);
+
+  const currentNode = getNodeAtPath(stored.tree, path.map((item) => item.branch));
+  const resultConfidence = Math.max(50, Math.min(96, confidence - Math.max(0, path.length - 2) * 2));
 
   useEffect(() => {
-    document.body.dataset.theme = stored.settings.theme;
-    document.body.classList.toggle("no-animations", !stored.settings.animations);
     saveStoredState(stored);
   }, [stored]);
+
+  useEffect(() => {
+    if (view === "landing") {
+      document.body.dataset.theme = "light";
+      return;
+    }
+    document.body.dataset.theme = "light";
+  }, [view]);
 
   useEffect(() => {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -74,7 +78,7 @@ export function App() {
       }
 
       const target = event.target as HTMLElement | null;
-      if (target?.matches("input, textarea, select") || view !== "game" || !isBranch(currentNode)) return;
+      if (target?.matches("input, textarea, select") || view !== "game" || !isBranch(currentNode) || isThinking) return;
 
       const answer = shortcutMap[event.key.toLowerCase()];
       if (!answer) return;
@@ -84,13 +88,29 @@ export function App() {
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  });
+  }, [view, currentNode, isThinking, path, fallback, confidence, roundSaved, stored.tree]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   const updateStored = (updater: (state: StoredState) => StoredState) => {
     setStored((current) => updater(current));
   };
 
+  const clearActiveTimer = () => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
   const startGame = () => {
+    clearActiveTimer();
     setPath([]);
     setFallback(null);
     setConfidence(88);
@@ -102,22 +122,22 @@ export function App() {
   const answerQuestion = (answer: Answer) => {
     if (view !== "game" || !isBranch(currentNode) || isThinking) return;
 
+    clearActiveTimer();
+
     const normalized = normalizeAnswer(answer);
     const branch = normalized.branch ?? fallback ?? "yes";
     const nextPath = [...path, { question: currentNode.question, answer, branch }];
 
     setIsThinking(true);
-    window.setTimeout(
-      () => {
-        const nextNode = getNodeAtPath(stored.tree, nextPath.map((item) => item.branch));
-        setPath(nextPath);
-        setFallback(branch === "yes" ? "no" : "yes");
-        setConfidence((value) => Math.max(52, value + normalized.confidenceDelta));
-        setView(isLeaf(nextNode) ? "result" : "game");
-        setIsThinking(false);
-      },
-      stored.settings.animations ? 260 : 0
-    );
+    timerRef.current = window.setTimeout(() => {
+      const nextNode = getNodeAtPath(stored.tree, nextPath.map((item) => item.branch));
+      setPath(nextPath);
+      setFallback(branch === "yes" ? "no" : "yes");
+      setConfidence((value) => Math.max(52, value + normalized.confidenceDelta));
+      setView(isLeaf(nextNode) ? "result" : "game");
+      setIsThinking(false);
+      timerRef.current = null;
+    }, 180);
   };
 
   const addHistory = (success: boolean, character: string, itemConfidence: number) => {
@@ -156,7 +176,7 @@ export function App() {
     const learnedNode = createLearnedNode(currentNode.guess, correctName, question, learnForm.correctSide);
     updateStored((state) => ({
       ...state,
-      tree: replaceNodeAtPath(state.tree, branchPath, learnedNode),
+      tree: replaceNodeAtPath(state.tree, path.map((item) => item.branch), learnedNode),
       history: [
         { character: correctName, confidence: 100, date: formatDate(), success: false },
         ...state.history
@@ -168,11 +188,8 @@ export function App() {
     setView("landing");
   };
 
-  const updateSettings = (settings: Settings) => {
-    updateStored((state) => ({ ...state, settings }));
-  };
-
   const resetData = () => {
+    clearActiveTimer();
     const nextState = createInitialState();
     setStored(nextState);
     setPath([]);
@@ -198,8 +215,8 @@ export function App() {
             <button className="ghost-btn" type="button" onClick={() => setActiveModal("keyboard")}>
               Shortcuts
             </button>
-            <button className="ghost-btn" type="button" onClick={() => setActiveModal("settings")}>
-              Settings
+            <button className="ghost-btn" type="button" onClick={() => setActiveModal("how")}>
+              How it works
             </button>
           </nav>
         </header>
@@ -229,7 +246,9 @@ export function App() {
           <section className="view is-active" aria-live="polite" aria-labelledby="questionText">
             <article className="glass-card game-card">
               <div className="progress-row">
-                <span>{path.length + 1} question{path.length === 0 ? "" : "s"}</span>
+                <span>
+                  {path.length + 1} question{path.length === 0 ? "" : "s"}
+                </span>
                 <div className="progress-track" aria-hidden="true">
                   <div className="progress-fill" style={{ width: `${Math.min(92, 18 + path.length * 18)}%` }} />
                 </div>
@@ -292,34 +311,6 @@ export function App() {
           <li>Answer each question with the closest match.</li>
           <li>If the guess is wrong, teach Who? one question that separates the answers.</li>
         </ol>
-      </Modal>
-
-      <Modal isOpen={activeModal === "settings"} onClose={() => setActiveModal(null)} labelledBy="settingsTitle">
-        <p className="eyebrow">Settings</p>
-        <h3 id="settingsTitle">Personalize the experience</h3>
-        <label className="setting-row" htmlFor="themeSelect">
-          <span>Theme</span>
-          <select
-            id="themeSelect"
-            value={stored.settings.theme}
-            onChange={(event) => updateSettings({ ...stored.settings, theme: event.target.value as Settings["theme"] })}
-          >
-            <option value="light">Light</option>
-            <option value="soft">Soft light</option>
-          </select>
-        </label>
-        <label className="setting-row switch-row" htmlFor="animationsToggle">
-          <span>Animations</span>
-          <input
-            id="animationsToggle"
-            type="checkbox"
-            checked={stored.settings.animations}
-            onChange={(event) => updateSettings({ ...stored.settings, animations: event.target.checked })}
-          />
-        </label>
-        <button className="danger-btn" type="button" onClick={resetData}>
-          Reset learned data
-        </button>
       </Modal>
 
       <Modal isOpen={activeModal === "learn"} onClose={() => setActiveModal(null)} labelledBy="learnTitle">
@@ -390,12 +381,15 @@ export function App() {
               <div className="history-item" key={`${round.character}-${round.date}-${index}`}>
                 <span>{round.character}</span>
                 <small>
-                  {round.confidence}% - {round.success ? "correct" : "learned"} - {round.date}
+                  {round.confidence}% — {round.success ? "correct" : "learned"} — {round.date}
                 </small>
               </div>
             ))
           )}
         </div>
+        <button className="danger-btn" type="button" onClick={resetData}>
+          Reset learned data
+        </button>
       </Modal>
 
       <Modal isOpen={activeModal === "keyboard"} onClose={() => setActiveModal(null)} labelledBy="keyboardTitle">
@@ -428,7 +422,7 @@ function Modal({ isOpen, labelledBy, children, onClose }: ModalProps) {
     <div className="modal is-open" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
       <div className="modal-card glass-card">
         <button className="close-btn" type="button" onClick={onClose} aria-label="Close">
-          x
+          ×
         </button>
         {children}
       </div>

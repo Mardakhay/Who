@@ -1,6 +1,6 @@
-import type { Answer, BranchNode, BranchSide, Settings, StoredState, TreeNode } from "./types";
+import type { Answer, BranchNode, BranchSide, HistoryItem, StoredState, TreeNode } from "./types";
 
-export const STORAGE_KEY = "who:mvp:v1";
+export const STORAGE_KEY = "who:mvp:v2";
 export const HISTORY_LIMIT = 12;
 
 export const defaultTree: TreeNode = {
@@ -29,21 +29,36 @@ export const defaultTree: TreeNode = {
   }
 };
 
-export const defaultSettings: Settings = {
-  theme: "light",
-  animations: true
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
 };
 
 export const cloneTree = (tree: TreeNode): TreeNode => JSON.parse(JSON.stringify(tree)) as TreeNode;
 
 export const isLeaf = (node: TreeNode | unknown): node is { guess: string } => {
-  return Boolean(node && typeof node === "object" && "guess" in node && typeof (node as { guess?: unknown }).guess === "string");
+  return Boolean(isPlainObject(node) && typeof node.guess === "string" && node.guess.trim().length > 0);
 };
 
 export const isBranch = (node: TreeNode | unknown): node is BranchNode => {
-  if (!node || typeof node !== "object") return false;
-  const candidate = node as { question?: unknown; yes?: unknown; no?: unknown };
-  return typeof candidate.question === "string" && Boolean(candidate.yes) && Boolean(candidate.no);
+  return Boolean(
+    isPlainObject(node) &&
+      typeof node.question === "string" &&
+      node.question.trim().length > 0 &&
+      "yes" in node &&
+      "no" in node
+  );
+};
+
+export const sanitizeTree = (node: unknown): TreeNode => {
+  if (isLeaf(node)) return { guess: node.guess.trim() };
+  if (isBranch(node)) {
+    return {
+      question: node.question.trim(),
+      yes: sanitizeTree(node.yes),
+      no: sanitizeTree(node.no)
+    };
+  }
+  return cloneTree(defaultTree);
 };
 
 export const normalizeAnswer = (answer: Answer): { branch: BranchSide | null; confidenceDelta: number } => {
@@ -94,17 +109,36 @@ export const createLearnedNode = (
 
 export const createInitialState = (): StoredState => ({
   tree: cloneTree(defaultTree),
-  history: [],
-  settings: { ...defaultSettings }
+  history: []
 });
+
+const sanitizeHistory = (value: unknown): HistoryItem[] => {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(
+      (item): item is HistoryItem =>
+        isPlainObject(item) &&
+        typeof item.character === "string" &&
+        typeof item.confidence === "number" &&
+        typeof item.date === "string" &&
+        typeof item.success === "boolean"
+    )
+    .map((item) => ({
+      character: item.character.trim(),
+      confidence: Math.max(0, Math.min(100, Math.round(item.confidence))),
+      date: item.date.trim(),
+      success: item.success
+    }))
+    .filter((item) => item.character.length > 0 && item.date.length > 0)
+    .slice(0, HISTORY_LIMIT);
+};
 
 export const loadStoredState = (): StoredState => {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") as Partial<StoredState>;
     return {
-      tree: isBranch(saved.tree) || isLeaf(saved.tree) ? saved.tree : cloneTree(defaultTree),
-      history: Array.isArray(saved.history) ? saved.history.slice(0, HISTORY_LIMIT) : [],
-      settings: { ...defaultSettings, ...(saved.settings || {}) }
+      tree: sanitizeTree(saved.tree),
+      history: sanitizeHistory(saved.history)
     };
   } catch {
     return createInitialState();
