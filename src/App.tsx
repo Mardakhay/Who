@@ -4,7 +4,6 @@ import {
   HISTORY_LIMIT,
   createInitialState,
   createLearnedNode,
-  getNodeAtPath,
   isBranch,
   isLeaf,
   loadStoredState,
@@ -13,6 +12,13 @@ import {
   saveStoredState
 } from "./game";
 import type { Answer, BranchSide, HistoryItem, ModalName, PathItem, StoredState, ViewName } from "./types";
+import { applyAnswer, createCandidateState, getBestQuestion } from "./engine/candidateEngine";
+import type { CandidateState, Question } from "./types/engine";
+import entitiesData from "./data/entities.json";
+import questionsData from "./data/questions.json";
+
+const allEntities = entitiesData as import("./types/engine").Entity[];
+const allQuestions = questionsData as Question[];
 
 type LearnFormState = {
   correctName: string;
@@ -36,7 +42,14 @@ const shortcutMap: Record<string, Answer> = {
   "?": "dont_know"
 };
 
-const formatDate = () => new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+const formatDate = () =>
+  new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+
+const answerToBool = (answer: Answer): boolean | null => {
+  if (answer === "yes" || answer === "probably") return true;
+  if (answer === "no" || answer === "probably_not") return false;
+  return null;
+};
 
 export function App() {
   const [stored, setStored] = useState<StoredState>(() => loadStoredState());
@@ -53,9 +66,17 @@ export function App() {
     correctSide: "yes"
   });
 
+  // Candidate engine state
+  const [candidateState, setCandidateState] = useState<CandidateState>(() =>
+    createCandidateState(allEntities)
+  );
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(() =>
+    getBestQuestion(createCandidateState(allEntities), allQuestions)
+  );
+  const [guess, setGuess] = useState<string | null>(null);
+
   const timerRef = useRef<number | null>(null);
 
-  const currentNode = getNodeAtPath(stored.tree, path.map((item) => item.branch));
   const resultConfidence = Math.max(50, Math.min(96, confidence - Math.max(0, path.length - 2) * 2));
 
   useEffect(() => {
@@ -72,10 +93,14 @@ export function App() {
         setActiveModal(null);
         return;
       }
-
       const target = event.target as HTMLElement | null;
-      if (target?.matches("input, textarea, select") || view !== "game" || !isBranch(currentNode) || isThinking) return;
-
+      if (
+        target?.matches("input, textarea, select") ||
+        view !== "game" ||
+        currentQuestion === null ||
+        isThinking
+      )
+        return;
       const answer = shortcutMap[event.key.toLowerCase()];
       if (!answer) return;
       event.preventDefault();
@@ -84,13 +109,11 @@ export function App() {
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [view, currentNode, isThinking, path, fallback, confidence, roundSaved, stored.tree]);
+  }, [view, currentQuestion, isThinking, path, fallback, confidence, roundSaved, candidateState]);
 
   useEffect(() => {
     return () => {
-      if (timerRef.current !== null) {
-        window.clearTimeout(timerRef.current);
-      }
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     };
   }, []);
 
@@ -107,43 +130,72 @@ export function App() {
 
   const startGame = () => {
     clearActiveTimer();
+    const fresh = createCandidateState(allEntities);
+    const firstQ = getBestQuestion(fresh, allQuestions);
     setPath([]);
     setFallback(null);
     setConfidence(88);
     setRoundSaved(false);
     setIsThinking(false);
+    setGuess(null);
+    setCandidateState(fresh);
+    setCurrentQuestion(firstQ);
     setView("game");
   };
 
   const answerQuestion = (answer: Answer) => {
-    if (view !== "game" || !isBranch(currentNode) || isThinking) return;
+    if (view !== "game" || currentQuestion === null || isThinking) return;
 
     clearActiveTimer();
 
     const normalized = normalizeAnswer(answer);
     const branch = normalized.branch ?? fallback ?? "yes";
-    const nextPath = [...path, { question: currentNode.question, answer, branch }];
+    const nextPath = [...path, { question: currentQuestion.text, answer, branch }];
 
     setIsThinking(true);
     timerRef.current = window.setTimeout(() => {
-      const nextNode = getNodeAtPath(stored.tree, nextPath.map((item) => item.branch));
+      const boolAnswer = answerToBool(answer);
+      let nextState = candidateState;
+
+      if (boolAnswer !== null) {
+        nextState = applyAnswer(candidateState, currentQuestion.id, currentQuestion.factKey, boolAnswer);
+      }
+
+      const remaining = nextState.candidates;
+      const nextQ = getBestQuestion(nextState, allQuestions);
+
       setPath(nextPath);
       setFallback(branch === "yes" ? "no" : "yes");
-      setConfidence((value) => Math.max(52, value + normalized.confidenceDelta));
-      setView(isLeaf(nextNode) ? "result" : "game");
+      setConfidence((v) => Math.max(52, v + normalized.confidenceDelta));
+      setCandidateState(nextState);
+
+      if (remaining.length <= 1 || nextQ === null) {
+        const topGuess = remaining[0]?.name ?? "someone";
+        setGuess(topGuess);
+        setCurrentQuestion(null);
+        setIsThinking(false);
+        timerRef.current = null;
+        setView("result");
+        return;
+      }
+
+      if (remaining.length === 2) {
+        setGuess(remaining[0].name);
+        setCurrentQuestion(nextQ);
+        setIsThinking(false);
+        timerRef.current = null;
+        setView("result");
+        return;
+      }
+
+      setCurrentQuestion(nextQ);
       setIsThinking(false);
       timerRef.current = null;
     }, 180);
   };
 
   const addHistory = (success: boolean, character: string, itemConfidence: number) => {
-    const item: HistoryItem = {
-      character,
-      confidence: itemConfidence,
-      date: formatDate(),
-      success
-    };
-
+    const item: HistoryItem = { character, confidence: itemConfidence, date: formatDate(), success };
     updateStored((state) => ({
       ...state,
       history: [item, ...state.history].slice(0, HISTORY_LIMIT)
@@ -151,8 +203,8 @@ export function App() {
   };
 
   const markCorrect = () => {
-    if (roundSaved || !isLeaf(currentNode)) return;
-    addHistory(true, currentNode.guess, resultConfidence);
+    if (roundSaved || guess === null) return;
+    addHistory(true, guess, resultConfidence);
     setRoundSaved(true);
   };
 
@@ -163,13 +215,12 @@ export function App() {
 
   const learnFromMistake = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isLeaf(currentNode)) return;
-
     const correctName = learnForm.correctName.trim();
     const question = learnForm.distinguishingQuestion.trim();
-    if (!correctName || !question) return;
+    if (!correctName || !question || guess === null) return;
 
-    const learnedNode = createLearnedNode(currentNode.guess, correctName, question, learnForm.correctSide);
+    const currentLeaf = { guess };
+    const learnedNode = createLearnedNode(currentLeaf.guess, correctName, question, learnForm.correctSide);
     updateStored((state) => ({
       ...state,
       tree: replaceNodeAtPath(state.tree, path.map((item) => item.branch), learnedNode),
@@ -193,9 +244,15 @@ export function App() {
     setConfidence(88);
     setRoundSaved(false);
     setIsThinking(false);
+    setGuess(null);
+    setCandidateState(createCandidateState(allEntities));
+    setCurrentQuestion(getBestQuestion(createCandidateState(allEntities), allQuestions));
     setActiveModal(null);
     setView("landing");
   };
+
+  const currentGuessDisplay = guess ?? "someone";
+  const candidatesLeft = candidateState.candidates.length;
 
   return (
     <>
@@ -205,10 +262,10 @@ export function App() {
             Who<span>?</span>
           </button>
           <nav className="top-actions" aria-label="App actions">
-            <button className="ghost-btn" type="button" onClick={() => setActiveModal("history") }>
+            <button className="ghost-btn" type="button" onClick={() => setActiveModal("history")}>
               History
             </button>
-            <button className="ghost-btn" type="button" onClick={() => setActiveModal("keyboard") }>
+            <button className="ghost-btn" type="button" onClick={() => setActiveModal("keyboard")}>
               Shortcuts
             </button>
           </nav>
@@ -235,21 +292,29 @@ export function App() {
           </section>
         )}
 
-        {view === "game" && isBranch(currentNode) && (
+        {view === "game" && currentQuestion !== null && (
           <section className="view is-active" aria-live="polite" aria-labelledby="questionText">
             <article className="glass-card game-card">
               <div className="progress-row">
                 <span>
                   {path.length + 1} question{path.length === 0 ? "" : "s"}
+                  {candidatesLeft > 1 && (
+                    <span className="candidates-hint"> &middot; {candidatesLeft} possible</span>
+                  )}
                 </span>
                 <div className="progress-track" aria-hidden="true">
-                  <div className="progress-fill" style={{ width: `${Math.min(92, 18 + path.length * 18)}%` }} />
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${Math.min(92, 18 + path.length * 18)}%` }}
+                  />
                 </div>
               </div>
               <p className="eyebrow">Question</p>
-              <h2 id="questionText">{currentNode.question}</h2>
+              <h2 id="questionText">{currentQuestion.text}</h2>
               <div className={`thinking${isThinking ? " is-visible" : ""}`} aria-hidden={!isThinking}>
-                Thinking<span>.</span><span>.</span><span>.</span>
+                Thinking<span>.</span>
+                <span>.</span>
+                <span>.</span>
               </div>
               <div className="answer-grid" aria-label="Answer choices" hidden={isThinking}>
                 {(Object.keys(answerLabels) as Answer[]).map((answer) => (
@@ -267,12 +332,12 @@ export function App() {
           </section>
         )}
 
-        {view === "result" && isLeaf(currentNode) && (
+        {view === "result" && (
           <section className="view is-active" aria-labelledby="resultTitle">
             <article className="glass-card result-card">
               <p className="eyebrow">Result</p>
               <h2 id="resultTitle">
-                I think it's <span>{currentNode.guess}</span>.
+                I think it's <span>{currentGuessDisplay}</span>.
               </h2>
               <p className="subcopy">
                 Confidence: <strong>{resultConfidence}%</strong>
@@ -311,7 +376,7 @@ export function App() {
           <p className="eyebrow">Learn</p>
           <h3 id="learnTitle">Teach Who? the right answer</h3>
           <p className="modal-note">
-            Current guess: <strong>{isLeaf(currentNode) ? currentNode.guess : "this guess"}</strong>
+            Current guess: <strong>{currentGuessDisplay}</strong>
           </p>
           <label>
             Correct character name
@@ -328,7 +393,9 @@ export function App() {
             Distinguishing question
             <textarea
               value={learnForm.distinguishingQuestion}
-              onChange={(event) => setLearnForm((form) => ({ ...form, distinguishingQuestion: event.target.value }))}
+              onChange={(event) =>
+                setLearnForm((form) => ({ ...form, distinguishingQuestion: event.target.value }))
+              }
               rows={3}
               placeholder="Does this character shoot webs?"
               required
@@ -399,12 +466,24 @@ export function App() {
         <p className="eyebrow">Shortcuts</p>
         <h3 id="keyboardTitle">Quick answers</h3>
         <ul className="shortcut-list">
-          <li><kbd>Y</kbd> Yes</li>
-          <li><kbd>N</kbd> No</li>
-          <li><kbd>P</kbd> Probably</li>
-          <li><kbd>H</kbd> Probably not</li>
-          <li><kbd>?</kbd> Don't know</li>
-          <li><kbd>Esc</kbd> Close modal</li>
+          <li>
+            <kbd>Y</kbd> Yes
+          </li>
+          <li>
+            <kbd>N</kbd> No
+          </li>
+          <li>
+            <kbd>P</kbd> Probably
+          </li>
+          <li>
+            <kbd>H</kbd> Probably not
+          </li>
+          <li>
+            <kbd>?</kbd> Don't know
+          </li>
+          <li>
+            <kbd>Esc</kbd> Close modal
+          </li>
         </ul>
       </Modal>
     </>

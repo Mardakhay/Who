@@ -262,6 +262,11 @@ h3 {
   font-size: 0.9rem;
 }
 
+.candidates-hint {
+  opacity: 0.65;
+  font-size: 0.82rem;
+}
+
 .progress-track {
   height: 8px;
   overflow: hidden;

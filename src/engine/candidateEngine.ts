@@ -45,14 +45,24 @@ export const applyAnswer = (
 export const getRemainingCandidates = (state: CandidateState): Entity[] => state.candidates;
 
 /**
- * Returns questions that have not yet been asked.
- *
- * TODO (Phase 2): Replace this with entropy-based selection.
- * Choose the question whose factKey splits remaining candidates closest to 50/50:
- *   score(q) = -|trueCount/total - 0.5|   (higher is better)
- * Return questions sorted descending by score so callers can pick state.candidates[0].
+ * Returns unanswered questions sorted by how evenly they split remaining candidates.
+ * Questions closer to a 50/50 split appear first, maximising information gained per question.
  */
 export const getAvailableQuestions = (state: CandidateState, allQuestions: Question[]): Question[] => {
   const asked = new Set(state.askedQuestions);
-  return allQuestions.filter((q) => !asked.has(q.id));
+  const available = allQuestions.filter((q) => !asked.has(q.id));
+  const total = state.candidates.length;
+  if (total === 0) return available;
+
+  return available.slice().sort((a, b) => {
+    const scoreOf = (q: Question) => {
+      const trueCount = state.candidates.filter((e) => e.facts[q.factKey] === true).length;
+      return -Math.abs(trueCount / total - 0.5);
+    };
+    return scoreOf(b) - scoreOf(a);
+  });
 };
+
+/** Returns the single best next question, or null if none remain. */
+export const getBestQuestion = (state: CandidateState, allQuestions: Question[]): Question | null =>
+  getAvailableQuestions(state, allQuestions)[0] ?? null;
