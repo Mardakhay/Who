@@ -4,6 +4,7 @@ import {
   HISTORY_LIMIT,
   createInitialState,
   createLearnedNode,
+  defaultStats,
   isBranch,
   isLeaf,
   loadStoredState,
@@ -196,10 +197,19 @@ export function App() {
 
   const addHistory = (success: boolean, character: string, itemConfidence: number) => {
     const item: HistoryItem = { character, confidence: itemConfidence, date: formatDate(), success };
-    updateStored((state) => ({
-      ...state,
-      history: [item, ...state.history].slice(0, HISTORY_LIMIT)
-    }));
+    updateStored((state) => {
+      const newStreak = success ? state.stats.currentStreak + 1 : 0;
+      return {
+        ...state,
+        history: [item, ...state.history].slice(0, HISTORY_LIMIT),
+        stats: {
+          gamesPlayed: state.stats.gamesPlayed + 1,
+          wins: state.stats.wins + (success ? 1 : 0),
+          currentStreak: newStreak,
+          bestStreak: Math.max(state.stats.bestStreak, newStreak)
+        }
+      };
+    });
   };
 
   const markCorrect = () => {
@@ -238,6 +248,7 @@ export function App() {
   const resetData = () => {
     clearActiveTimer();
     const nextState = createInitialState();
+    nextState.stats = { ...defaultStats };
     setStored(nextState);
     setPath([]);
     setFallback(null);
@@ -309,6 +320,15 @@ export function App() {
                   />
                 </div>
               </div>
+              {candidatesLeft > 1 && candidatesLeft <= 5 && (
+                <div className="candidates-preview">
+                  {candidateState.candidates.slice(0, 5).map((c, i) => (
+                    <span key={c.id} className="candidate-chip" style={{ animationDelay: `${i * 40}ms` }}>
+                      {c.name}
+                    </span>
+                  ))}
+                </div>
+              )}
               <p className="eyebrow">Question</p>
               <h2 id="questionText">{currentQuestion.text}</h2>
               <div className={`thinking${isThinking ? " is-visible" : ""}`} aria-hidden={!isThinking}>
@@ -443,6 +463,24 @@ export function App() {
             Reset data
           </button>
         </div>
+        <div className="stats-grid">
+          <div className="stat-item">
+            <span className="stat-value">{stored.stats.gamesPlayed}</span>
+            <span className="stat-label">Played</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-value">{stored.stats.wins}</span>
+            <span className="stat-label">Wins</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-value">{stored.stats.currentStreak}</span>
+            <span className="stat-label">Streak</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-value">{stored.stats.bestStreak}</span>
+            <span className="stat-label">Best</span>
+          </div>
+        </div>
         {stored.history.length === 0 ? (
           <p className="modal-note">No saved rounds yet.</p>
         ) : (
@@ -499,6 +537,18 @@ type ModalProps = {
 
 function Modal({ isOpen, onClose, labelledBy, children }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement | null>(null);
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      closeBtnRef.current?.focus();
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -513,7 +563,13 @@ function Modal({ isOpen, onClose, labelledBy, children }: ModalProps) {
     >
       <div className="modal">
         <article className="modal-card glass-card" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
-          <button className="close-btn" type="button" aria-label="Close modal" onClick={onClose}>
+          <button
+            ref={closeBtnRef}
+            className="close-btn"
+            type="button"
+            aria-label="Close modal"
+            onClick={onClose}
+          >
             ×
           </button>
           {children}

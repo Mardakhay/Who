@@ -123,6 +123,21 @@ textarea:focus-visible {
   display: grid;
 }
 
+.view.is-active .glass-card {
+  animation: fadeSlideIn 320ms ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .glass-card {
   width: min(100%, 680px);
   border: 1px solid var(--line);
@@ -267,6 +282,31 @@ h3 {
   font-size: 0.82rem;
 }
 
+.candidates-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.candidate-chip {
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  animation: chipPop 280ms ease-out forwards;
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+@keyframes chipPop {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .progress-track {
   height: 8px;
   overflow: hidden;
@@ -309,8 +349,12 @@ h3 {
 .thinking {
   display: none;
   margin-top: 28px;
+  padding: 16px 24px;
+  background: rgba(100, 100, 100, 0.06);
+  border-radius: 16px;
   color: var(--muted);
   font-weight: 650;
+  text-align: center;
 }
 
 .thinking.is-visible {
@@ -348,12 +392,34 @@ h3 {
   z-index: 10;
   background: rgba(245, 245, 241, 0.68);
   backdrop-filter: blur(8px);
+  animation: backdropFadeIn 200ms ease-out;
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-card {
   width: 100%;
   padding: clamp(24px, 5vw, 34px);
   position: relative;
+  animation: modalSlideIn 280ms ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal form {
@@ -469,6 +535,40 @@ textarea {
 
 .history-header h3 {
   margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 .history-list {

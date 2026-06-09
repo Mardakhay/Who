@@ -22,9 +22,17 @@ export type HistoryItem = {
   success: boolean;
 };
 
+export type GameStats = {
+  gamesPlayed: number;
+  wins: number;
+  currentStreak: number;
+  bestStreak: number;
+};
+
 export type StoredState = {
   tree: TreeNode;
   history: HistoryItem[];
+  stats: GameStats;
 };
 
 export type PathItem = {
