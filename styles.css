@@ -446,9 +446,82 @@ textarea {
   color: var(--muted);
 }
 
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.modal-actions .primary-btn,
+.modal-actions .secondary-btn {
+  flex: 1;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.history-header h3 {
+  margin: 0;
+}
+
 .history-list {
   display: grid;
   gap: 10px;
+}
+
+.shortcut-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.shortcut-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+
+.shortcut-list li:first-child {
+  border-top: none;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge.success {
+  background: rgba(34, 139, 34, 0.12);
+  color: #2a7a2a;
+}
+
+.badge.fail {
+  background: rgba(180, 80, 80, 0.12);
+  color: #8f3f3f;
+}
+
+.history-item strong {
+  display: block;
+  color: var(--text);
+}
+
+.history-item p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .history-item,

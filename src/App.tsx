@@ -504,19 +504,21 @@ function Modal({ isOpen, onClose, labelledBy, children }: ModalProps) {
 
   return (
     <div
-      className="modal-overlay"
+      className="modal-backdrop"
       ref={overlayRef}
       onClick={(event) => {
         if (event.target === overlayRef.current) onClose();
       }}
       role="presentation"
     >
-      <article className="modal-card" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
-        <button className="modal-close" type="button" aria-label="Close modal" onClick={onClose}>
-          ×
-        </button>
-        {children}
-      </article>
+      <div className="modal">
+        <article className="modal-card glass-card" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
+          <button className="close-btn" type="button" aria-label="Close modal" onClick={onClose}>
+            ×
+          </button>
+          {children}
+        </article>
+      </div>
     </div>
   );
 }
