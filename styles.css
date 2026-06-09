@@ -69,6 +69,10 @@ textarea:focus-visible {
   outline-offset: 3px;
 }
 
+::selection {
+  background: rgba(21, 21, 21, 0.12);
+}
+
 .app-shell {
   width: min(100%, 1120px);
   min-height: 100vh;
@@ -265,6 +269,22 @@ h3 {
 .answer-btn:hover {
   transform: translateY(-1px);
   border-color: var(--line-strong);
+}
+
+.primary-btn:active,
+.secondary-btn:active,
+.ghost-btn:active,
+.danger-btn:active,
+.text-btn:active,
+.answer-btn:active {
+  transform: translateY(0);
+}
+
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .progress-row {
@@ -563,6 +583,10 @@ textarea {
   line-height: 1;
 }
 
+.stat-value.highlight {
+  color: #2a7a2a;
+}
+
 .stat-label {
   font-size: 0.75rem;
   color: var(--muted);
@@ -712,6 +736,24 @@ kbd {
   .primary-btn,
   .secondary-btn {
     flex: 1 1 160px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .candidates-preview {
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-header .danger-btn {
+    width: auto;
   }
 }
 

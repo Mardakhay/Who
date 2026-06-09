@@ -76,9 +76,11 @@ export const getBestQuestion = (state: CandidateState, allQuestions: Question[])
 export const getBestCandidate = (state: CandidateState): Entity | null => {
   if (state.candidates.length === 0) return null;
   const entries = Object.entries(state.answers);
-  return state.candidates.reduce((best, entity) => {
-    const score = entries.filter(([key, val]) => entity.facts[key] === val).length;
-    const bestScore = entries.filter(([key, val]) => best.facts[key] === val).length;
-    return score > bestScore ? entity : best;
-  });
+
+  const scoreEntity = (entity: Entity): number =>
+    entries.filter(([key, val]) => entity.facts[key] === val).length;
+
+  return state.candidates.reduce((best, entity) =>
+    scoreEntity(entity) > scoreEntity(best) ? entity : best
+  );
 };

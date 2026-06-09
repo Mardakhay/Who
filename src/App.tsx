@@ -105,12 +105,17 @@ export function App() {
       const answer = shortcutMap[event.key.toLowerCase()];
       if (!answer) return;
       event.preventDefault();
+      handleAnswer(answer);
+    };
+
+    const handleAnswer = (answer: Answer) => {
+      if (view !== "game" || currentQuestion === null || isThinking) return;
       answerQuestion(answer);
     };
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [view, currentQuestion, isThinking, path, fallback, confidence, roundSaved, candidateState]);
+  }, [view, currentQuestion, isThinking]);
 
   useEffect(() => {
     return () => {
@@ -180,7 +185,7 @@ export function App() {
         return;
       }
 
-      if (remaining.length === 2) {
+      if (remaining.length === 2 && nextQ !== null) {
         setGuess(remaining[0].name);
         setCurrentQuestion(nextQ);
         setIsThinking(false);
@@ -237,7 +242,13 @@ export function App() {
       history: [
         { character: correctName, confidence: 100, date: formatDate(), success: false },
         ...state.history
-      ].slice(0, HISTORY_LIMIT)
+      ].slice(0, HISTORY_LIMIT),
+      stats: {
+        gamesPlayed: state.stats.gamesPlayed + 1,
+        wins: state.stats.wins,
+        currentStreak: 0,
+        bestStreak: state.stats.bestStreak
+      }
     }));
 
     setRoundSaved(true);
@@ -360,7 +371,8 @@ export function App() {
                 I think it's <span>{currentGuessDisplay}</span>.
               </h2>
               <p className="subcopy">
-                Confidence: <strong>{resultConfidence}%</strong>
+                Guessed in <strong>{path.length} question{path.length !== 1 ? "s" : ""}</strong> with{" "}
+                <strong>{resultConfidence}%</strong> confidence
               </p>
               <div className="progress-track confidence" aria-hidden="true">
                 <div className="progress-fill" style={{ width: `${resultConfidence}%` }} />
@@ -473,8 +485,12 @@ export function App() {
             <span className="stat-label">Wins</span>
           </div>
           <div className="stat-item">
-            <span className="stat-value">{stored.stats.currentStreak}</span>
-            <span className="stat-label">Streak</span>
+            <span className="stat-value">
+              {stored.stats.gamesPlayed > 0
+                ? Math.round((stored.stats.wins / stored.stats.gamesPlayed) * 100)
+                : 0}%
+            </span>
+            <span className="stat-label">Rate</span>
           </div>
           <div className="stat-item">
             <span className="stat-value">{stored.stats.bestStreak}</span>
